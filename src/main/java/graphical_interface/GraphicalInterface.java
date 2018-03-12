@@ -11,6 +11,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -31,6 +33,8 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JSlider;
 import javax.swing.KeyStroke;
+
+import com.google.gson.Gson;
 
 /**
  * 
@@ -309,7 +313,25 @@ public class GraphicalInterface extends JFrame {
 		saveButton.setBounds(10, 330, 60, 37);
 		saveButton.setBorder(BorderFactory.createRaisedBevelBorder());
 		menuPanel.add(saveButton);
-		
+		saveButton.addActionListener(new ActionListener() {
+			int count = 0;
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				count++;
+		        Gson gson = new Gson();
+		        String json = gson.toJson(streetMap);
+		        System.out.println(json);
+
+				try {
+					FileWriter file = new FileWriter("src\\save\\java\\save"+count+".json\\");
+					gson.toJson(streetMap, file);
+					file.close();
+				} catch (IOException e) {
+
+					e.printStackTrace();
+				}
+			} 
+		});
 		JButton loadButton = new JButton("load");
 		loadButton.setBounds(97, 330, 60, 37);
 		loadButton.setBorder(BorderFactory.createRaisedBevelBorder());
