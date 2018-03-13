@@ -321,8 +321,12 @@ public class GraphicalInterface extends JFrame {
 		        Gson gson = new Gson();
 		        String json = gson.toJson(streetMap);
 		        System.out.println(json);
-
+		        File f = new File("src\\save\\java\\save"+count+".json\\");
 				try {
+					while(f.exists() && !f.isDirectory()) {
+						count++;
+						f = new File("src\\save\\java\\save"+count+".json\\");
+					}
 					FileWriter file = new FileWriter("src\\save\\java\\save"+count+".json\\");
 					gson.toJson(streetMap, file);
 					file.close();
