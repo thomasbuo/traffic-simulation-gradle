@@ -7,9 +7,6 @@ public interface Graph<Node, Edge> {
 	List<Node> getNeighbours(Node n);
 	List<Edge> getAdjacentEdges(Node n);
 	double getWeight(Edge e);
-
-	
-	
 	
 	// example for astar
 	enum Action{
