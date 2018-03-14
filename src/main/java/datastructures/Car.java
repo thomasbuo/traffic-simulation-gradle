@@ -25,42 +25,51 @@ public class Car {
 		positionY = startPoint.getYCoord();
 	}
 
+	public static void main(String[] args){
+
+		Intersection start = new Intersection(0,0);
+		Intersection end = new Intersection(15,15);
+	}
+
 	/**
 	 *
 	 *
 	 */
-	public void update(List<Car> list_of_cars, int timeStep){
+	public void update(List<Car> list_of_cars, Intersection localEndPoint, int timeStep){
 
-		velocity = safeVelocity(list_of_cars);
+		//Get the safe velocity
+		velocity = safeVelocity(list_of_cars, localEndPoint);
+
+		//new position of the car
 		int x = (int)  (positionX +  velocity*timeStep +  0.5*acceleration*Math.pow(timeStep,2));
 
+		//distance from the beginning of the current road
 		int distance = Math.abs(startPoint.getXCoord() - x);
 
-		int y;
-
+		//start point converted to vector
 		int[] sVector = new int[2];
 		sVector[0] = startPoint.getXCoord();
 		sVector[1] = startPoint.getYCoord();
 
+		//end point converted to vector
 		int[] eVector = new int[2];
 		eVector[0] = endPoint.getXCoord();
 		eVector[1] = endPoint.getYCoord();
 
+		//difference of the two vectors
 		int[] vector = new int[2];
 		vector[0] = eVector[0] - sVector[0];
 		vector[1] = eVector[1] - sVector[1];
 
+		//get the norm of the vector
 		double vectorNorm = Math.sqrt(Math.pow(vector[0],2) + Math.pow(vector[1],2));
 
-		int[] normVector = new int[2];
-		normVector[0] = (int) (vector[0]/vectorNorm);
-		normVector[1] = (int) (vector[1]/vectorNorm);
+		int[] normalizedVector = new int[2];
+		normalizedVector[0] = (int) (vector[0]/vectorNorm);
+		normalizedVector[1] = (int) (vector[1]/vectorNorm);
 
-		normVector[0] += distance*normVector[0];
-		normVector[1] += distance*normVector[1];
-
-		positionX = normVector[0];
-		positionY = normVector[1];
+		positionX = x;
+		positionY = startPoint.getYCoord() + distance*normalizedVector[1];
 	}
 
 	/**
@@ -68,9 +77,9 @@ public class Car {
 	 * @return the safe velocity for the car, SUMO formula
 	 * if car is leading car returns maximum allowed velocity set to 5
 	 */
-	public double safeVelocity(List<Car> list_of_cars){
+	public double safeVelocity(List<Car> list_of_cars, Intersection localEndPoint){
 
-		if(positionX == endPoint.getXCoord()){
+		if(positionX == localEndPoint.getXCoord()){
 			acceleration = 0;
 			return 0;
 		}
