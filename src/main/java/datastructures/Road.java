@@ -7,6 +7,14 @@ public class Road {
 	private int x2;
 	private int y2;
 	private int length;
+	public int getLength() {
+		return length;
+	}
+
+	public void setLength(int length) {
+		this.length = length;
+	}
+
 	private boolean two_way;
 	
 	public Road(Intersection intersection_from, Intersection intersection_to) {
