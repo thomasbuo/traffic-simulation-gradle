@@ -17,6 +17,10 @@ public class TrafficLight {
 		return status;
 	}
 	
+	public int getRoad() {
+		return road;
+	}
+	
 	public void setStatus(String status) {
 		if (status != "R" && status != "G") {
 			System.out.println("Illegal status '" + status + "'");

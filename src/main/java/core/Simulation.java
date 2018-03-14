@@ -83,7 +83,7 @@ public class Simulation {
 				// update traffic light statuses
 				this.street_map.update();
 				// recalculate car positions
-				car.update(this.cars, t);
+				car.update(this.cars,null, t);
 				
 				System.out.println(car);
 			}

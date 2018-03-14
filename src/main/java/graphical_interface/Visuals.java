@@ -129,6 +129,18 @@ public class Visuals extends JPanel{
 			g2.fillOval((int)((roads.get(i).getX2()-5)*zoomMultiplier + changeX), (int)((roads.get(i).getY2()-5)*zoomMultiplier + changeY), (int)(10*zoomMultiplier), (int)(10*zoomMultiplier ));
 		
 		}
+		
+		for (int i = 0; i < streetMap.getTrafficLights().size(); i++) {
+			int roadIndex = streetMap.getTrafficLights().get(i).getRoad();
+			Road road = streetMap.getRoads().get(roadIndex);
+			int midPointX = (int) (road.getX1() +((road.getX2()-road.getX1())/2));
+			int midPointY = (int) (road.getY1() +((road.getY2()-road.getY1())/2));
+			g2.setColor(Color.cyan);
+			g2.draw(new Line2D.Double(midPointX, midPointY, road.getX1(), road.getY1()));
+			g2.setColor(Color.yellow);
+			g2.draw(new Line2D.Double(midPointX, midPointY, road.getX2(), road.getY2()));
+			
+		}
  
 		g2.setColor(Color.MAGENTA);
 		for(int i = 0; i<simulation.getCars().size(); i ++)
