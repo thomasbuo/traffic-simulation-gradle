@@ -11,7 +11,7 @@ public class Connection {
 		this.destination = destination;
 		
 		if (trafficlight == null) {
-			this.trafficlight = new TrafficLight();
+			this.trafficlight = new TrafficLight(road, destination);
 		} else {
 			this.trafficlight = trafficlight;
 		}

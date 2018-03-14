@@ -2,8 +2,13 @@ package datastructures;
 
 public class TrafficLight {
 	private String status;
+	private int road;
+	private int intersection;
 
-	public TrafficLight() {
+	public TrafficLight(int road, int intersection) {
+		this.road = road;
+		this.intersection = intersection;
+		
 		this.status = "R";
 	}
 
@@ -18,6 +23,8 @@ public class TrafficLight {
 		}
 		this.status = status;
 	}
+	
+	
 
 	// ACTIONS
 	

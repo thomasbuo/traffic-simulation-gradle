@@ -97,6 +97,15 @@ public class StreetMap {
 		return this.intersections.get(intersection).getConnectedIntersectionIds();
 	}
 	
+	public ArrayList<TrafficLight> getTrafficLights() {
+		ArrayList<TrafficLight> all_trafficlights = new ArrayList<TrafficLight>();
+		for (Intersection intersection : this.intersections) {
+			all_trafficlights.addAll(intersection.getTrafficLights());
+		}
+		
+		return all_trafficlights;
+	}
+	
 	// GRAPH MODIFICATION
 
 	/**
