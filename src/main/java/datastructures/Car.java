@@ -2,8 +2,6 @@ package datastructures;
 
 
 
-import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Car {
@@ -16,7 +14,6 @@ public class Car {
 	private int acceleration = 1;//assign the value you want
 	private int positionX;
 	private int positionY;
-	protected double timeStep = 1;
 	public static final int REACTION_TIME = 1;
 	public static final int MAX_VELOCITY = 5;
 
@@ -31,15 +28,16 @@ public class Car {
 	/**
 	 *
 	 * @param list_of_cars
-	 * @return the new position of the car
-	 * it does NOT automatically update the position!
+	 * @return the distance (length) that the car has covered
 	 */
-	public int update(List<Car> list_of_cars, int t){
+	public int update(List<Car> list_of_cars, int timeStep){
 
 		velocity = safeVelocity(list_of_cars);
-		positionX = (int)  (positionX +  velocity*timeStep +  0.5*acceleration*Math.pow(timeStep,2));
+		int distance = (int)  (positionX +  velocity*timeStep +  0.5*acceleration*Math.pow(timeStep,2));
 
-		return positionX;
+		int origin = startPoint.getXCoord();
+
+		return Math.abs(origin - distance);
 	}
 
 	/**
@@ -48,6 +46,12 @@ public class Car {
 	 * if car is leading car returns maximum allowed velocity set to 5
 	 */
 	public double safeVelocity(List<Car> list_of_cars){
+
+		if(positionX == endPoint.getXCoord()){
+			acceleration = 0;
+			return 0;
+		}
+
 
 		double safe_velocity = 0;
 		int index = -1; //keeps track of the index of the leading vehicle in the list
@@ -81,19 +85,6 @@ public class Car {
 
 		return safe_velocity;
 	}
-
-
-
-	/**
-	 *
-	 * @return the time the car took to reach its final destination in ms, -1 if the car is not at its target
-	 */
-	public int timeTravelled(){
-
-		return -1;
-	}
-
-
 
 	public Intersection getStartPoint() {
 		return startPoint;
