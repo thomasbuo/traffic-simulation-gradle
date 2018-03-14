@@ -16,19 +16,21 @@ public class Pathfinding {
 	public int[] neighborDistance(int xCoordinate, int yCoordinate) {
 		Intersection intersections = new Intersection(xCoordinate, yCoordinate);
 		ArrayList<int[]> neighbors = intersections.getConnections();
-		System.out.println(neighbors[1]);
+		//System.out.println(neighbors[1]);
+		return null;
 	}
 	
 	
 	public ArrayList<Integer> aStar(int start, int end) {
-	
+		return null;
 	}
 	
 	public ArrayList<Integer> dijkstra(int start, int end) {
 		ArrayList<Integer> path = new ArrayList<Integer>();
-		
+		//oohsorry, what?
 		
 		return path;
 	}
 }
-}
+//ugh
+
