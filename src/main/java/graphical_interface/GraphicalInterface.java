@@ -153,29 +153,6 @@ public class GraphicalInterface extends JFrame {
 		contentPane.add(menuPanel);
 		menuPanel.setLayout(null);
 		
-		JButton undoButton = new JButton("undo");
-		undoButton.setBounds(10, 59, 147, 37);
-		undoButton.setBorder(BorderFactory.createRaisedBevelBorder());
-		menuPanel.add(undoButton);
-		undoButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(streetMap.getRoads().size()>0)
-				{
-					streetMap.getIntersections().remove(streetMap.getIntersections().size()-1);
-					streetMap.getRoads().remove(streetMap.getRoads().size()-1);
-					repaint();
-				}
-				else
-				{
-					simulation.reset();
-					streetMap.clearMap();
-				}
-				repaint();
-				
-			}
-		});
 		
 		JButton clearButton = new JButton("clear");
 		clearButton.setLocation(10, 11);
