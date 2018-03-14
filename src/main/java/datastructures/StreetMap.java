@@ -1,16 +1,15 @@
 package datastructures;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
- * 
  * @author weidler
  *
  * A StreetMap is an undirected graph with Intersections as its vertices and 
  * Connections as its edges. The graph is represented as an adjacency matrix.
  * That is, it holds all edges in a matrix where the columns and rows represent
  * the vertex indices.
- *
  */
 public class StreetMap {
 	
@@ -19,6 +18,7 @@ public class StreetMap {
 	 * inside the AdjacencyMatrix.
 	 */
 	private ArrayList<Intersection> intersections;
+
 	/**
 	 * 
 	 * Array List storing Roads of the map.;
@@ -26,6 +26,7 @@ public class StreetMap {
 	private ArrayList<Road> roads = new ArrayList<Road>();
 
 	// CONSTRUCTORS
+
 	public StreetMap() {
 		this.intersections = new ArrayList<Intersection>();
 		this.roads = new ArrayList<Road>();
@@ -39,6 +40,63 @@ public class StreetMap {
 		this.roads = roads;
 	}
 	
+	// GETTER / SETTER
+	public ArrayList<Road> getRoads()
+	{
+		return roads;
+	}
+	
+	/**
+	 * Get an Intersection based on its ID.
+	 */
+	public Intersection getIntersection(int ID) {
+		return this.intersections.get(ID);
+	}
+	
+	public int getIntersectionIdByCoordinates(int x, int y) {
+		for (int intersection_id = 0; intersection_id < this.intersections.size(); intersection_id++) {
+			if (this.intersections.get(intersection_id).getXCoord() == x && this.intersections.get(intersection_id).getYCoord() == y) {
+				return intersection_id;
+			}
+		}
+		
+		return -1;
+	}
+	
+	public Intersection getIntersectionByCoordinates(int x, int y) {
+		return this.getIntersection(this.getIntersectionIdByCoordinates(x, y));
+	}
+	
+	public ArrayList<Intersection> getIntersections ()
+	{
+		return intersections;
+	}
+
+	/**
+	 * Get the Road object connecting the start and end Intersections (provided as Integers)
+	 */
+	public Road getRoadBetween(int start, int end) {
+		return this.roads.get(this.intersections.get(start).getRoadTo(end));
+	}
+	
+	/**
+	 * Get the Road object identified by coordinates. If there is no road between these coordinates,
+	 * null is returned.
+	 */
+	public Road getRoadByCoordinates(int x_start, int y_start, int x_end, int y_end) {
+		for (Road road : this.roads) {
+			if (road.getX1() == x_start && road.getY1() == y_start && road.getX2() == x_end && road.getY2() == y_end) {
+				return road;
+			}
+		}
+		
+		return null;
+	}
+
+	public ArrayList<Integer> getNeighbors(int intersection) {
+		return this.intersections.get(intersection).getConnectedIntersectionIds();
+	}
+	
 	// GRAPH MODIFICATION
 
 	/**
@@ -50,32 +108,27 @@ public class StreetMap {
 	 */
 	public void addRoad(int start, int end) {
 		Road new_road = new Road(this.intersections.get(start), this.intersections.get(end));
-		
-		if (this.roadAlreadyOccupied(new_road)) {
-			System.out.println("There already exists a road between these coordinates/intersections. Skipping addition.");
-		} else {
-			this.roads.add(new_road);
-			
-			this.intersections.get(start).addConnection(this.roads.size() - 1, end);
-			this.intersections.get(end).addConnection(this.roads.size() - 1, start);
-		}
+		this.addRoad(new_road);
+
 	}
 	
 	public void addRoad(Road road) {
-		if (this.roadAlreadyOccupied(road)) {
+		int int_a_id = this.getIntersectionIdByCoordinates(road.getX1(), road.getY1());
+		int int_b_id = this.getIntersectionIdByCoordinates(road.getX2(), road.getY2());
+		
+		if (int_a_id < 0 || int_b_id < 0) {
+			System.out.println("You tried adding a road between at least one missing Intersection."
+					+ "Probably, you should create intersections first, THEN add the road.");
+		} else if (this.roadAlreadyOccupied(road)) {
 			System.out.println("There already exists a road between these coordinates/intersections. Skipping addition.");
+		} else if (!this.intersections.get(int_a_id).connectionCanBeAdded() || !this.intersections.get(int_b_id).connectionCanBeAdded()) {
+			// TODO handle empty intersection leftovers
+			System.out.println("One of the intersections you are planning to connect can't have more connections added.");
 		} else {
 			this.roads.add(road);
-			
-			int int_a_id = this.getIntersectionIdByCoordinates(road.getX1(), road.getY1());
-			int int_b_id = this.getIntersectionIdByCoordinates(road.getX2(), road.getY2());
-
-			if (int_a_id < 0 || int_b_id < 0) {
-				System.out.println("You tried adding a road between at least one missing Intersection. Probably, you should create intersections first, THEN add the road.");
-			}
-			
-			this.intersections.get(int_a_id).addConnection(this.roads.size() - 1, int_b_id);
-			this.intersections.get(int_b_id).addConnection(this.roads.size() - 1, int_a_id);			
+						
+			this.intersections.get(int_a_id).addConnection(this.roads.size() - 1, int_b_id, null);
+			this.intersections.get(int_b_id).addConnection(this.roads.size() - 1, int_a_id, null);			
 		}
 	}
 	
@@ -121,11 +174,11 @@ public class StreetMap {
 		int intersection_b = -1;
 
 		for (int int_id = 0; int_id < this.intersections.size(); int_id++) {
-			ArrayList<int[]> connections = this.intersections.get(int_id).getConnections();
+			ArrayList<Connection> connections = this.intersections.get(int_id).getConnections();
 			for (int c_id = 0; c_id < connections.size(); c_id++) {
-				if (connections.get(c_id)[0] == road_id) {
+				if (connections.get(c_id).getRoad() == road_id) {
 					intersection_a = int_id;
-					intersection_b = connections.get(c_id)[1];
+					intersection_b = (int) connections.get(c_id).getDestination();
 					break;
 				}
 			}
@@ -188,63 +241,6 @@ public class StreetMap {
 		this.roads.clear();
 	}
 	
-	// GETTER / SETTER
-	public ArrayList<Road> getRoads()
-	{
-		return roads;
-	}
-	
-	/**
-	 * Get an Intersection based on its ID.
-	 */
-	public Intersection getIntersection(int ID) {
-		return this.intersections.get(ID);
-	}
-	
-	public int getIntersectionIdByCoordinates(int x, int y) {
-		for (int intersection_id = 0; intersection_id < this.intersections.size(); intersection_id++) {
-			if (this.intersections.get(intersection_id).getXCoord() == x && this.intersections.get(intersection_id).getYCoord() == y) {
-				return intersection_id;
-			}
-		}
-		
-		return -1;
-	}
-	
-	public Intersection getIntersectionByCoordinates(int x, int y) {
-		return this.getIntersection(this.getIntersectionIdByCoordinates(x, y));
-	}
-	
-	public ArrayList<Intersection> getIntersections ()
-	{
-		return intersections;
-	}
-
-	/**
-	 * Get the Road object connecting the start and end Intersections (provided as Integers)
-	 */
-	public Road getRoadBetween(int start, int end) {
-		return this.roads.get(this.intersections.get(start).getRoadTo(end));
-	}
-	
-	/**
-	 * Get the Road object identified by coordinates. If there is no road between these coordinates,
-	 * null is returned.
-	 */
-	public Road getRoadByCoordinates(int x_start, int y_start, int x_end, int y_end) {
-		for (Road road : this.roads) {
-			if (road.getX1() == x_start && road.getY1() == y_start && road.getX2() == x_end && road.getY2() == y_end) {
-				return road;
-			}
-		}
-		
-		return null;
-	}
-
-	public ArrayList<Integer> getNeighbors(int intersection) {
-		return this.intersections.get(intersection).getConnectedIntersectionIds();
-	}
-	
 	// META INFORMATION
 
 	public int roadCount() {
@@ -267,6 +263,14 @@ public class StreetMap {
 		ArrayList<Integer> path = new ArrayList<Integer>();
 		
 		return path;
+	}
+	
+	// ACTIONS
+	
+	public void update() {
+		for (Intersection intersection : this.intersections) {
+			intersection.updateTrafficLights();			
+		}
 	}
 	
 	// VALIDATORS

@@ -34,7 +34,7 @@ public class Car {
 	 * @return the new position of the car
 	 * it does NOT automatically update the position!
 	 */
-	public int update(List<Car> list_of_cars){
+	public int update(List<Car> list_of_cars, int t){
 
 		velocity = safeVelocity(list_of_cars);
 		positionX = (int)  (positionX +  velocity*timeStep +  0.5*acceleration*Math.pow(timeStep,2));
@@ -146,4 +146,8 @@ public class Car {
 	public double getVelocity(){ return velocity;}
 
 	public void setVelocity(double velocity){this.velocity = velocity;}
+	
+	public String toString() {
+		return "Car: (" + this.positionX + ", " + this.positionY + ")"; 
+	}
 }

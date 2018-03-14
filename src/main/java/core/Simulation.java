@@ -5,6 +5,7 @@ import java.util.Random;
 
 import datastructures.StreetMap;
 import datastructures.Car;
+import datastructures.Intersection;
 
 public class Simulation {
 
@@ -17,6 +18,18 @@ public class Simulation {
 		this.street_map = map;
 		this.cars = new ArrayList<Car>();
 	}
+	
+	// GETTERS / SETTERS
+	
+	public ArrayList<Car> getCars() {
+		return this.cars;
+	}
+	
+	public StreetMap getStreetMap() {
+		return this.street_map;
+	}
+	
+	// ACTIONS
 	
 	public void addCar(Car car) {
 		this.cars.add(car);	
@@ -43,17 +56,32 @@ public class Simulation {
 		}
 	}
 	
-	public ArrayList<Car> getCars() {
-		return this.cars;
-	}
-	
-	public StreetMap getStreetMap() {
-		return this.street_map;
-	}
+	// SIMULATION
 	
 	public void start() {
 		run = true;
 		System.out.println("start");
+		
+		// Initialize
+		for (Intersection is : this.street_map.getIntersections()) {
+			is.initializeTrafficLightSettings();
+		}
+		
+		int t = 1;
+		int timesteps = 1000;
+		while (t < timesteps) { // ultimately, have some sort of "simulation finished" function here checking if everybody arrived
+
+			for (Car car : this.cars) {
+				// update traffic light statuses
+				this.street_map.update();
+				// recalculate car positions
+				car.update(this.cars, t);
+				
+				System.out.println(car);
+			}
+			
+			t++;
+		}
 	}
 
 	public void stop() {

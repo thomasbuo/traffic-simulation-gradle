@@ -59,7 +59,7 @@ public class GraphicalInterface extends JFrame {
 	private int clickCounter = 0;
 	
 	/**
-	 * start and end coordinates of raods.
+	 * start and end coordinates of roads.
 	 */
 	private int startX;
 	private int startY;
@@ -418,7 +418,7 @@ public class GraphicalInterface extends JFrame {
 						{
 							
 							double distance2 = (double)(Math.sqrt(Math.pow(x - sec.getXCoord(), 2) + (Math.pow(y - sec.getYCoord(), 2))));
-							System.out.println("1 distance "+ distance+" distance 2 "+distance2);
+							// System.out.println("1 distance "+ distance+" distance 2 "+distance2);
 							if (distance == -1) {
 								distance = distance2;							
 								nearestX = sec.getXCoord();						
@@ -426,7 +426,7 @@ public class GraphicalInterface extends JFrame {
 							}
 							else if(distance2 < distance)
 							{
-								System.out.println("2 distance "+ distance+" distance 2 "+distance2);
+								// System.out.println("2 distance "+ distance+" distance 2 "+distance2);
 								distance = distance2;
 								nearestX = sec.getXCoord();
 								nearestY = sec.getYCoord();							
@@ -453,7 +453,7 @@ public class GraphicalInterface extends JFrame {
 					{
 						
 						double distance2 = (double)(Math.sqrt(Math.pow(x - sec.getXCoord(), 2) + (Math.pow(y - sec.getYCoord(), 2))));
-						System.out.println("1 distance "+ distance+" distance 2 "+distance2);
+						// System.out.println("1 distance "+ distance+" distance 2 "+distance2);
 						if (distance == -1) {
 							distance = distance2;							
 							nearestX = sec.getXCoord();						
@@ -461,7 +461,7 @@ public class GraphicalInterface extends JFrame {
 						}
 						else if(distance2 < distance)
 						{
-							System.out.println("2 distance "+ distance+" distance 2 "+distance2);
+							// System.out.println("2 distance "+ distance+" distance 2 "+distance2);
 							distance = distance2;
 							nearestX = sec.getXCoord();
 							nearestY = sec.getYCoord();							
@@ -495,7 +495,7 @@ public class GraphicalInterface extends JFrame {
 				{
 					
 					double distance2 = (double)(Math.sqrt(Math.pow(x - sec.getXCoord(), 2) + (Math.pow(y - sec.getYCoord(), 2))));
-					System.out.println("1 distance "+ distance+" distance 2 "+distance2);
+					// System.out.println("1 distance "+ distance+" distance 2 "+distance2);
 					if (distance == -1) {
 						distance = distance2;							
 						nearestX = sec.getXCoord();						
@@ -503,7 +503,7 @@ public class GraphicalInterface extends JFrame {
 					}
 					else if(distance2 < distance)
 					{
-						System.out.println("2 distance "+ distance+" distance 2 "+distance2);
+						// System.out.println("2 distance "+ distance+" distance 2 "+distance2);
 						distance = distance2;
 						nearestX = sec.getXCoord();
 						nearestY = sec.getYCoord();							
@@ -572,7 +572,7 @@ public class GraphicalInterface extends JFrame {
 				{
 					
 					double distance2 = (double)(Math.sqrt(Math.pow(mouseX - sec.getXCoord(), 2) + (Math.pow(mouseY - sec.getYCoord(), 2))));
-					System.out.println("1 distance "+ distance+" distance 2 "+distance2);
+					// System.out.println("1 distance "+ distance+" distance 2 "+distance2);
 					if (distance == -1) {
 						distance = distance2;							
 						nearestX = sec.getXCoord();						
@@ -580,7 +580,7 @@ public class GraphicalInterface extends JFrame {
 					}
 					else if(distance2 < distance)
 					{
-						System.out.println("2 distance "+ distance+" distance 2 "+distance2);
+						// System.out.println("2 distance "+ distance+" distance 2 "+distance2);
 						distance = distance2;
 						nearestX = sec.getXCoord();
 						nearestY = sec.getYCoord();							

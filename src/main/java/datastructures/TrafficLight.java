@@ -2,12 +2,12 @@ package datastructures;
 
 public class TrafficLight {
 	private String status;
-	private int[] cycling_structure;
 
-	public TrafficLight(int[] cycling_structure) {
+	public TrafficLight() {
 		this.status = "R";
 	}
-	
+
+	// GETTERS / SETTERS
 	public String getStatus() {
 		return status;
 	}
@@ -18,12 +18,14 @@ public class TrafficLight {
 		}
 		this.status = status;
 	}
+
+	// ACTIONS
 	
-	public int[] getCyclingStructure() {
-		return cycling_structure;
-	}
-	
-	public void setCyclingStructure(int[] cycling_structure) {
-		this.cycling_structure = cycling_structure;
+	public void toggle() {
+		if (this.status == "R") {
+			this.setStatus("G");
+		} else if (this.status == "G") {
+			this.setStatus("R");
+		}
 	}
 }
