@@ -91,7 +91,7 @@ public class Simulation {
 			t++;
 		}
 
-		
+		////////////
 		Expansion<SearchContext<StreetMap, Intersection>, Intersection> expansionFcn =
 				new Expansion<SearchContext<StreetMap, Intersection>, Intersection>() {
 
@@ -135,7 +135,7 @@ public class Simulation {
 					}
 			
 		};
-		
+		/////////////////
 		// Search for first car
 		
 		Car bestCar = getCars().get(0);
