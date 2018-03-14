@@ -27,17 +27,40 @@ public class Car {
 
 	/**
 	 *
-	 * @param list_of_cars
-	 * @return the distance (length) that the car has covered
+	 *
 	 */
-	public int update(List<Car> list_of_cars, int timeStep){
+	public void update(List<Car> list_of_cars, int timeStep){
 
 		velocity = safeVelocity(list_of_cars);
-		int distance = (int)  (positionX +  velocity*timeStep +  0.5*acceleration*Math.pow(timeStep,2));
+		int x = (int)  (positionX +  velocity*timeStep +  0.5*acceleration*Math.pow(timeStep,2));
 
-		int origin = startPoint.getXCoord();
+		int distance = Math.abs(startPoint.getXCoord() - x);
 
-		return Math.abs(origin - distance);
+		int y;
+
+		int[] sVector = new int[2];
+		sVector[0] = startPoint.getXCoord();
+		sVector[1] = startPoint.getYCoord();
+
+		int[] eVector = new int[2];
+		eVector[0] = endPoint.getXCoord();
+		eVector[1] = endPoint.getYCoord();
+
+		int[] vector = new int[2];
+		vector[0] = eVector[0] - sVector[0];
+		vector[1] = eVector[1] - sVector[1];
+
+		double vectorNorm = Math.sqrt(Math.pow(vector[0],2) + Math.pow(vector[1],2));
+
+		int[] normVector = new int[2];
+		normVector[0] = (int) (vector[0]/vectorNorm);
+		normVector[1] = (int) (vector[1]/vectorNorm);
+
+		normVector[0] += distance*normVector[0];
+		normVector[1] += distance*normVector[1];
+
+		positionX = normVector[0];
+		positionY = normVector[1];
 	}
 
 	/**
