@@ -2,8 +2,6 @@ package datastructures;
 
 
 
-import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Car {
@@ -16,7 +14,6 @@ public class Car {
 	private int acceleration = 1;//assign the value you want
 	private int positionX;
 	private int positionY;
-	protected double timeStep = 1;
 	public static final int REACTION_TIME = 1;
 	public static final int MAX_VELOCITY = 5;
 
@@ -30,16 +27,40 @@ public class Car {
 
 	/**
 	 *
-	 * @param list_of_cars
-	 * @return the new position of the car
-	 * it does NOT automatically update the position!
+	 *
 	 */
-	public int update(List<Car> list_of_cars, int t){
+	public void update(List<Car> list_of_cars, int timeStep){
 
 		velocity = safeVelocity(list_of_cars);
-		positionX = (int)  (positionX +  velocity*timeStep +  0.5*acceleration*Math.pow(timeStep,2));
+		int x = (int)  (positionX +  velocity*timeStep +  0.5*acceleration*Math.pow(timeStep,2));
 
-		return positionX;
+		int distance = Math.abs(startPoint.getXCoord() - x);
+
+		int y;
+
+		int[] sVector = new int[2];
+		sVector[0] = startPoint.getXCoord();
+		sVector[1] = startPoint.getYCoord();
+
+		int[] eVector = new int[2];
+		eVector[0] = endPoint.getXCoord();
+		eVector[1] = endPoint.getYCoord();
+
+		int[] vector = new int[2];
+		vector[0] = eVector[0] - sVector[0];
+		vector[1] = eVector[1] - sVector[1];
+
+		double vectorNorm = Math.sqrt(Math.pow(vector[0],2) + Math.pow(vector[1],2));
+
+		int[] normVector = new int[2];
+		normVector[0] = (int) (vector[0]/vectorNorm);
+		normVector[1] = (int) (vector[1]/vectorNorm);
+
+		normVector[0] += distance*normVector[0];
+		normVector[1] += distance*normVector[1];
+
+		positionX = normVector[0];
+		positionY = normVector[1];
 	}
 
 	/**
@@ -48,6 +69,12 @@ public class Car {
 	 * if car is leading car returns maximum allowed velocity set to 5
 	 */
 	public double safeVelocity(List<Car> list_of_cars){
+
+		if(positionX == endPoint.getXCoord()){
+			acceleration = 0;
+			return 0;
+		}
+
 
 		double safe_velocity = 0;
 		int index = -1; //keeps track of the index of the leading vehicle in the list
@@ -81,19 +108,6 @@ public class Car {
 
 		return safe_velocity;
 	}
-
-
-
-	/**
-	 *
-	 * @return the time the car took to reach its final destination in ms, -1 if the car is not at its target
-	 */
-	public int timeTravelled(){
-
-		return -1;
-	}
-
-
 
 	public Intersection getStartPoint() {
 		return startPoint;

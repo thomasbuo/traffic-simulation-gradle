@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import datastructures.Connection;
 import datastructures.Intersection;
 import datastructures.Node;
 import datastructures.StreetMap;
@@ -15,7 +16,7 @@ public class Pathfinding {
 	
 	public int[] neighborDistance(int xCoordinate, int yCoordinate) {
 		Intersection intersections = new Intersection(xCoordinate, yCoordinate);
-		ArrayList<int[]> neighbors = intersections.getConnections();
+		ArrayList<Connection> neighbors = intersections.getConnections();
 		//System.out.println(neighbors[1]);
 		return null;
 	}
