@@ -397,8 +397,7 @@ public class GraphicalInterface extends JFrame {
 			
 			if(visuals.getZoomMultiplier() == 1.0 && visuals.getChangeX()==0 && visuals.getChangeY() == 0) 
 			{
-			visuals.setDrawLine(true);
-			
+						
 			clickCounter++;
 			
 			int x = e.getX();
@@ -473,12 +472,23 @@ public class GraphicalInterface extends JFrame {
 					Intersection in = new Intersection(startX, startY);
 					streetMap.addIntersection(in);
 					
+					Intersection section = streetMap.getIntersectionByCoordinates(startX, startY);
+					if(!section.connectionCanBeAdded())
+					{
+						clickCounter=0;
+					}
+					
 				}
-				visuals.setStartPosX(startX);
-				visuals.setStartPosY(startY);
-				visuals.setDrawLine(true);
+				
+					visuals.setStartPosX(startX);
+					visuals.setStartPosY(startY);
+					if(clickCounter!=0) {
+						visuals.setDrawLine(true);
+					}
+				
 			}
-			else {
+			else 
+			{
 				
 				if (e.getButton() == MouseEvent.BUTTON3)
 			    {
