@@ -208,7 +208,7 @@ public class StreetMap {
 	 */
 	public void addIntersection(Intersection intersection) {
 		if (this.intersectionAlreadyExists(intersection)) {
-			System.out.println("Intersection already exists at these coordinates. Skipping addition.");		
+			System.out.println("Intersection already exists at these coordinates. Skipping addition. x: " + intersection.getXCoord()+ ", y: " +intersection.getYCoord() );		
 		} else {
 			this.intersections.add(intersection);
 		}

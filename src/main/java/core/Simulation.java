@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import a_star_stuff.AStarSearchContext;
+import a_star_stuff.Astar2;
 import a_star_stuff.Cost;
 import a_star_stuff.Estimation;
 import a_star_stuff.Expansion;
@@ -21,10 +22,12 @@ public class Simulation {
 	
 	private StreetMap street_map;
 	private ArrayList<Car> cars;
+	private Astar2 aStar;
 	
 	public Simulation(StreetMap map) {
 		this.street_map = map;
 		this.cars = new ArrayList<Car>();
+		aStar = new Astar2(map);
 	}
 	
 	// GETTERS / SETTERS
@@ -41,6 +44,11 @@ public class Simulation {
 	
 	public void addCar(Car car) {
 		this.cars.add(car);	
+		for(Intersection intersection : street_map.getIntersections())
+		{
+			intersection.resetParent();
+			intersection.resetCost();
+		}
 	}
 	
 	public void addRandomCar() {
@@ -54,7 +62,7 @@ public class Simulation {
 			destination = r.nextInt(this.street_map.getIntersections().size());
 		} while (destination == origin);
 	
-		this.addCar(new Car(this.street_map.getIntersection(origin), this.street_map.getIntersection(destination)));
+		this.addCar(new Car(this.street_map.getIntersection(origin), this.street_map.getIntersection(destination),aStar));
 		System.out.println("created new car, x: " + this.street_map.getIntersection(origin).getXCoord() + ", y: " + this.street_map.getIntersection(origin).getYCoord() + ", total: "+ this.getCars().size());
 	}
 	

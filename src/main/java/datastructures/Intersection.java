@@ -10,6 +10,34 @@ public class Intersection {
 	private int tl_phase_length;
 	private int time_till_toggle;
 	
+	private int cost;
+	private Intersection parent;
+	public void resetCost()
+	{
+		cost = 1000000000;
+	}
+	public void resetParent()
+	{
+		parent = null;
+	}
+	public int getCost() {
+		return cost;
+	}
+
+	public void setCost(int cost) {
+		this.cost = cost;
+	}
+
+	public Intersection getParent() {
+		return parent;
+	}
+
+	public void setParent(Intersection parent) {
+		this.parent = parent;
+	}
+
+	
+	
 	/**
 	 * Connections are of format (road, intersection, traffic light)
 	 */

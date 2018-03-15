@@ -2,7 +2,10 @@ package datastructures;
 
 
 
+import java.util.ArrayList;
 import java.util.List;
+
+import a_star_stuff.Astar2;
 
 public class Car {
 
@@ -16,13 +19,18 @@ public class Car {
 	private int positionY;
 	public static final int REACTION_TIME = 1;
 	public static final int MAX_VELOCITY = 5;
+	private ArrayList<Intersection> path;
 
-	public Car(Intersection startPoint , Intersection endPoint)
+	public Car(Intersection startPoint , Intersection endPoint, Astar2 aStar)
 	{
 		this.startPoint = startPoint;
 		this.endPoint = endPoint;
 		positionX = startPoint.getXCoord();
 		positionY = startPoint.getYCoord();
+		aStar.setStart(startPoint);
+		aStar.setEnd(endPoint);
+		path = aStar.createPath();
+		
 	}
 
 	public static void main(String[] args){
