@@ -10,8 +10,10 @@ public class Intersection {
 	private int tl_phase_length;
 	private int time_till_toggle;
 	
-	private int cost;
+	private double cost;
 	private Intersection parent;
+	private double g;
+	private double h;
 	public void resetCost()
 	{
 		cost = 1000000000;
@@ -20,12 +22,25 @@ public class Intersection {
 	{
 		parent = null;
 	}
-	public int getCost() {
+	public double getCost() {
 		return cost;
 	}
 
-	public void setCost(int cost) {
-		this.cost = cost;
+	public void setCost(double distance) {
+		this.cost = distance;
+	}
+	public void setG(double g) {
+		this.g = g;
+	}
+	public double getG() {
+		return g;
+	}
+
+	public void setH(double h) {
+		this.h = h;
+	}
+	public double getH() {
+		return h;
 	}
 
 	public Intersection getParent() {

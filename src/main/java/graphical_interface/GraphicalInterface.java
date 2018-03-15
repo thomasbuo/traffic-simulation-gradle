@@ -11,8 +11,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -33,6 +35,8 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JSlider;
 import javax.swing.KeyStroke;
+
+import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.gson.Gson;
 
@@ -323,8 +327,17 @@ public class GraphicalInterface extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				int returnVal = fc.showOpenDialog(drawPanel);
 				File file = fc.getSelectedFile();
+				 Gson gson = new Gson();
 				if(file!=null) {
-					System.out.println(file.getName());
+					ObjectMapper mapper = new ObjectMapper();
+
+					//JSON from file to Object
+					try {
+						StreetMap map = mapper.readValue(new File(file.getPath()), StreetMap.class);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		});
