@@ -7,6 +7,7 @@ public class Road {
 	private int x2;
 	private int y2;
 	private int length;
+	
 	public int getLength() {
 		return length;
 	}

@@ -10,6 +10,7 @@ public class Astar2 {
 	private Intersection start;
 	private Intersection end;
 	private StreetMap streetMap;
+
 	public Astar2(StreetMap map)
 	{		
 		streetMap = map;
@@ -49,10 +50,10 @@ public class Astar2 {
 			currentParent = closedList.get(closedList.size()-1);
 			for(int i = 0; i < currentParent.getConnections().size(); i++)
 			{
-				Intersection currentConnected = streetMap.getIntersection(currentParent.getConnections().get(i).getDestination());
+				Intersection currentConnected = currentParent.getConnections().get(i).getDestination();
 				if (!closedList.contains(currentConnected))
 				{
-					double g = streetMap.getRoads().get(currentParent.getConnections().get(i).getRoad()).getLength() + currentParent.getG();
+					double g = currentParent.getConnections().get(i).getRoad().getLength() + currentParent.getG();
 					double h =  Math.sqrt(Math.pow(currentConnected.getXCoord() - end.getXCoord(), 2) + Math.pow(currentConnected.getYCoord() - end.getYCoord(), 2)) ;
 					double distance = h + g;
 					
