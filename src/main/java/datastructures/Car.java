@@ -4,126 +4,299 @@ package datastructures;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import a_star_stuff.Astar2;
+import java.util.Random;
 
 public class Car {
 
 
 	private Intersection startPoint;
 	private Intersection endPoint;
-	private int breakSpeed = 1; //assign the value you want
+	private Road road;
+	private double breakSpeed = -1;
 	private double velocity = 0; //initial velocity is zero
-	private int acceleration = 1;//assign the value you want
-	private int positionX;
-	private int positionY;
-	public static final int REACTION_TIME = 1;
-	public static final int MAX_VELOCITY = 5;
-	private ArrayList<Intersection> path;
+	private double acceleration = 1.5;
+	private double positionX;
+	private double positionY;
+	private Random rnd = new Random();
+	public static final double REACTION_TIME = 1;
+	public static final double MAX_VELOCITY = 2;
+	public static final double HUMAN_ERROR = 0.2;
 
-	public Car(Intersection startPoint , Intersection endPoint, Astar2 aStar)
+	/**
+	 *
+	 * @param startPoint
+	 * @param endPoint
+	 * @param streetMap this object needs to be passed as parameter to find the road the car is in!
+	 */
+	public Car(Intersection startPoint , Intersection endPoint, StreetMap streetMap)
 	{
 		this.startPoint = startPoint;
 		this.endPoint = endPoint;
-		positionX = startPoint.getXCoord();
-		positionY = startPoint.getYCoord();
-		aStar.setStart(startPoint);
-		aStar.setEnd(endPoint);
-		path = aStar.createPath();
-		
+		positionX = (double) startPoint.getXCoord();
+		positionY = (double) startPoint.getYCoord();
+		this.road = streetMap.getRoadByCoordinates(startPoint.getXCoord(), startPoint.getYCoord(), endPoint.getXCoord(), endPoint.getYCoord());
 	}
 
-	public static void main(String[] args){
 
-		Intersection start = new Intersection(0,0);
-		Intersection end = new Intersection(15,15);
+
+	public static void main(String[] args) {
+
+		Intersection start = new Intersection(0, 0);
+		Intersection end = new Intersection(15, 15);
+
+		Road road = new Road(start,end);
+
+		StreetMap streetMap = new StreetMap();
+
+		streetMap.addIntersection(start);
+		streetMap.addIntersection(end);
+		streetMap.addRoad(road);
+
+		Car c1 = new Car(start,end,streetMap);
+		Car c2 = new Car(start,end,streetMap);
+		Car c3 = new Car(start,end,streetMap);
+
+		List<Car> list = new ArrayList<>();
+		list.add(c1);
+		list.add(c2);
+		list.add(c3);
+
+		for(int i=0; i<10; i++){
+
+			for(int j=0; j<list.size(); j++){
+				list.get(j).update(list,1);
+				System.out.println(list.get(j));
+			}
+
+			System.out.println();
+		}
+
+
+
 	}
 
 	/**
 	 *
-	 *
+	 * automatically updates the car coordinates, both x and y
 	 */
-	public void update(List<Car> list_of_cars, Intersection localEndPoint, int timeStep){
+	public void update(List<Car> list_of_cars, int timeStep){
 
-		//Get the safe velocity
-		velocity = safeVelocity(list_of_cars, localEndPoint);
+		if(noCarOnTheRoadHasMoved(list_of_cars,this.road))
+			accelerate(this,timeStep);
+		else{
+			//Get the safe velocity
+			double safe_velocity = safeVelocity(list_of_cars);
+			double desired_velocity = desiredVelocity(safe_velocity);
+			double rangeMin = (desired_velocity - HUMAN_ERROR*acceleration);
+			double rangeMax = desired_velocity;
+			velocity = Math.max(0, rangeMin + (rangeMax - rangeMin)*rnd.nextDouble());
+		}
+
+
 
 		//new position of the car
-		int x = (int)  (positionX +  velocity*timeStep +  0.5*acceleration*Math.pow(timeStep,2));
+		double x = (positionX +  velocity*timeStep +  0.5*acceleration*Math.pow(timeStep,2));
 
-		//distance from the beginning of the current road
-		int distance = Math.abs(startPoint.getXCoord() - x);
+		positionX =  x;
+		positionY = getY(); //must be used after acquiring the new x
+	}
 
-		//start point converted to vector
-		int[] sVector = new int[2];
-		sVector[0] = startPoint.getXCoord();
-		sVector[1] = startPoint.getYCoord();
+	/**
+	 *
+	 */
+	public void reset(){
 
-		//end point converted to vector
-		int[] eVector = new int[2];
-		eVector[0] = endPoint.getXCoord();
-		eVector[1] = endPoint.getYCoord();
+	}
 
-		//difference of the two vectors
-		int[] vector = new int[2];
-		vector[0] = eVector[0] - sVector[0];
-		vector[1] = eVector[1] - sVector[1];
 
-		//get the norm of the vector
-		double vectorNorm = Math.sqrt(Math.pow(vector[0],2) + Math.pow(vector[1],2));
+	/**
+	 *
+	 * @param car the first car to go
+	 * if no car has started moving yet, give acceleration to the leading car so that others can follow
+	 */
+	private void accelerate(Car car, int timeStep){
 
-		int[] normalizedVector = new int[2];
-		normalizedVector[0] = (int) (vector[0]/vectorNorm);
-		normalizedVector[1] = (int) (vector[1]/vectorNorm);
+		if(car.getVelocity() == 0 && car.positionX == car.startPoint.getXCoord()){
+			velocity += acceleration/timeStep + 0.5;
+		}
 
-		positionX = x;
-		positionY = startPoint.getYCoord() + distance*normalizedVector[1];
+	}
+
+	/**
+	 *
+	 * @param list_of_cars
+	 * @param road the road for which we are considering if cars have moed
+	 * @return false if a car that has different positionX from the x of its start point
+	 */
+	private boolean noCarOnTheRoadHasMoved(List<Car> list_of_cars, Road road){
+
+		for(int i=0; i<list_of_cars.size(); i++){
+
+			//for the case it compares with car on different road, skip to next iteration
+			if(!(list_of_cars.get(i).getRoad().equals(road)))
+				continue;
+
+			if(list_of_cars.get(i).getPositionX() != list_of_cars.get(i).getStartPoint().getXCoord())
+				return false;
+		}
+
+		return true;
 	}
 
 	/**
 	 *@param list_of_cars
 	 * @return the safe velocity for the car, SUMO formula
-	 * if car is leading car returns maximum allowed velocity set to 5
+	 * if car is leading car returns maximum allowed velocity set to 3
 	 */
-	public double safeVelocity(List<Car> list_of_cars, Intersection localEndPoint){
+	public double safeVelocity(List<Car> list_of_cars){
 
-		if(positionX == localEndPoint.getXCoord()){
+		//if the car has reached its destination, stop moving
+		if(getPositionX() == endPoint.getXCoord()){
 			acceleration = 0;
+			velocity = 0;
 			return 0;
 		}
 
+		if(isLeader(list_of_cars,this))
+			return MAX_VELOCITY;
 
-		double safe_velocity = 0;
-		int index = -1; //keeps track of the index of the leading vehicle in the list
-		double tracker = Double.MAX_VALUE; //keeps track of the position of the car with the smallest distance
-		boolean leader = true; //keeps track if the vehicle is the leading vehicle
+		double leading_vel = getLeadingCarVelocity(list_of_cars, this);
+		double gap = getLeadingCarDistance(list_of_cars, this);
+		//double avg_vel = averageVelocity(list_of_cars);
+		double deceleration = deceleration(velocity,leading_vel);
+
+		double safe_vel = leading_vel -  ((gap - leading_vel*REACTION_TIME) / ((velocity/deceleration) + REACTION_TIME));
+
+		return safe_vel;
+	}
+
+	private double desiredVelocity(double safe_velocity){
+
+		return Math.min(safe_velocity,Math.min(velocity + acceleration, MAX_VELOCITY));
+	}
+
+	private double deceleration(double velocity, double leading_velocity){
+		return velocity - leading_velocity;
+	}
+
+	private double averageVelocity(List<Car> list_of_cars){
+
+		double sum_of_velocities = 0;
+
+		for(Car c: list_of_cars)
+			sum_of_velocities += c.getVelocity();
+
+		return sum_of_velocities/list_of_cars.size();
+	}
+
+	/**
+	 *
+	 * @param list_of_cars
+	 * @param car
+	 * @return true if there is no car on the same road that has bigger x coordinate than the car passed to the method
+	 */
+	public boolean isLeader(List<Car> list_of_cars, Car car){
 
 		for(int i=0; i<list_of_cars.size(); i++){
 
-			//For the case it compares with itself
-			//Skip to the next iteration
-			if(positionX == list_of_cars.get(i).positionX)
+			//for the case it compares with itself skip to next iteration
+			if(list_of_cars.get(i).equals(car))
 				continue;
 
-			if(tracker > list_of_cars.get(i).positionX){
-				tracker = list_of_cars.get(i).positionX;
-				index = i;
+			//in case it compares with a car on a different road, skip to next iteration
+			if(!(list_of_cars.get(i).getRoad().equals(car.getRoad()))){
+				continue;
 			}
 
-			if(positionX - list_of_cars.get(i).positionX < 0)
-				leader = false;
+			//if there is one car of the same road with bigger x, then this car is not a leader
+			if(car.getPositionX() <= list_of_cars.get(i).getPositionX())
+				return false;
 		}
 
-		if(leader)
-			return MAX_VELOCITY;
+		//no car in the list was found to be on the same road with bigger x coordinate than this car
+		return true;
+	}
 
-		double leading_velocity = list_of_cars.get(index).velocity; //speed of leading vehicle
+	/**
+	 *
+	 * @param list_of_cars
+	 * @param car the car for which we want to find the velocity of the car directly in front of it
+	 * @return the leading velocity to be used by SUMO formula
+	 */
+	public double getLeadingCarVelocity(List<Car> list_of_cars, Car car){
 
-		double gap = Math.abs(positionX - list_of_cars.get(index).positionX); //distance from leading vehicle
+		double currentClosestPosition = Double.MAX_VALUE; //initially infinity
+		int index = -1; //keeps track of the index of the closest car in the list
 
-		safe_velocity = leading_velocity + ((gap - leading_velocity*REACTION_TIME)/((velocity/breakSpeed)+REACTION_TIME));
+		for(int i=0; i<list_of_cars.size(); i++){
 
-		return safe_velocity;
+			//for the case it compares with itself skip to next iteration
+			if(list_of_cars.get(i).equals(car))
+				continue;
+
+			//in case it compares with a car on a different road, skip to next iteration
+			if(!(list_of_cars.get(i).getRoad().equals(car.getRoad())))
+				continue;
+
+
+			//in case it compares with a car that is behind it, skip to the next iteration
+			if(list_of_cars.get(i).getPositionX() - car.getPositionX() <= 0)
+				continue;
+
+
+			if(list_of_cars.get(i).getPositionX() < currentClosestPosition){
+				currentClosestPosition = list_of_cars.get(i).getPositionX();
+				index = i;
+			}
+		}
+
+		return list_of_cars.get(index).getVelocity();
+	}
+
+	public double getLeadingCarDistance(List<Car> list_of_cars, Car car){
+
+		double currentClosestPosition = Double.MAX_VALUE; //initially infinity
+		int index = -1; //keeps track of the index of the closest car in the list
+
+		for(int i=0; i<list_of_cars.size(); i++){
+
+			//for the case it compares with itself skip to next iteration
+			if(list_of_cars.get(i).equals(car))
+				continue;
+
+			//in case it compares with a car on a different road, skip to next iteration
+			if(!(list_of_cars.get(i).getRoad().equals(car.getRoad())))
+				continue;
+
+
+			//in case it compares with a car that is behind it, skip to the next iteration
+			if(list_of_cars.get(i).getPositionX() - car.getPositionX() <= 0)
+				continue;
+
+
+			if(list_of_cars.get(i).getPositionX() < currentClosestPosition){
+				currentClosestPosition = list_of_cars.get(i).getPositionX();
+				index = i;
+			}
+		}
+
+		return Math.abs(car.getPositionX() - list_of_cars.get(index).getPositionX());
+	}
+
+	/**
+	 * Use after getting the x-coordinate
+	 * @return the y coordinate of the new point
+	 */
+	private double getY(){
+
+		//distance between start point and end point
+		double road_length = Math.sqrt(Math.pow(endPoint.getXCoord() - startPoint.getXCoord(), 2) + Math.pow(endPoint.getYCoord() - startPoint.getYCoord(),2));
+
+		double ratio_of_distances = (Math.abs(getPositionX() - startPoint.getYCoord()))/road_length;
+
+		double y = (1 - ratio_of_distances)*startPoint.getYCoord() + ratio_of_distances*endPoint.getYCoord();
+
+		return y;
 	}
 
 	public Intersection getStartPoint() {
@@ -142,7 +315,7 @@ public class Car {
 		this.endPoint = endPoint;
 	}
 
-	public int getBreakSpeed() {
+	public double getBreakSpeed() {
 		return breakSpeed;
 	}
 
@@ -150,7 +323,7 @@ public class Car {
 		this.breakSpeed = breakSpeed;
 	}
 
-	public int getAcceleration() {
+	public double getAcceleration() {
 		return acceleration;
 	}
 
@@ -158,7 +331,7 @@ public class Car {
 		this.acceleration = accelaration;
 	}
 
-	public int getPositionX() {
+	public double getPositionX() {
 		return positionX;
 	}
 
@@ -166,7 +339,7 @@ public class Car {
 		this.positionX = positionX;
 	}
 
-	public int getPositionY() {
+	public double getPositionY() {
 		return positionY;
 	}
 
@@ -176,9 +349,13 @@ public class Car {
 
 	public double getVelocity(){ return velocity;}
 
-	public void setVelocity(double velocity){this.velocity = velocity;}
+	public void setVelocity(int velocity){this.velocity = velocity;}
+
+	public Road getRoad(){
+		return road;
+	}
 	
 	public String toString() {
-		return "Car: (" + this.positionX + ", " + this.positionY + ")"; 
+		return "Car: (" + this.positionX + ", " + this.positionY + ", " + velocity + ")";
 	}
 }
