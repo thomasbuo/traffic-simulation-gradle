@@ -45,10 +45,7 @@ public class StreetMap {
 	{
 		return roads;
 	}
-	
-	/**
-	 * Get an Intersection based on its ID.
-	 */
+
 	public Intersection getIntersection(int ID) {
 		return this.intersections.get(ID);
 	}
@@ -73,13 +70,6 @@ public class StreetMap {
 	}
 
 	/**
-	 * Get the Road object connecting the start and end Intersections (provided as Integers)
-	 */
-	public Road getRoadBetween(int start, int end) {
-		return this.roads.get(this.intersections.get(start).getRoadTo(end));
-	}
-	
-	/**
 	 * Get the Road object identified by coordinates. If there is no road between these coordinates,
 	 * null is returned.
 	 */
@@ -91,10 +81,6 @@ public class StreetMap {
 		}
 		
 		return null;
-	}
-
-	public ArrayList<Integer> getNeighbors(int intersection) {
-		return this.intersections.get(intersection).getConnectedIntersectionIds();
 	}
 	
 	public ArrayList<TrafficLight> getTrafficLights() {
@@ -115,31 +101,37 @@ public class StreetMap {
 	 * @param end			ID of the ending intersection
 	 * @param road			Road object to be added	
 	 */
-	public void addRoad(int start, int end) {
-		Road new_road = new Road(this.intersections.get(start), this.intersections.get(end));
+	public void addRoad(Intersection start, Intersection end) {
+		Road new_road = new Road(start, end);
 		this.addRoad(new_road);
-
 	}
 	
 	public void addRoad(Road road) {
-		int int_a_id = this.getIntersectionIdByCoordinates(road.getX1(), road.getY1());
-		int int_b_id = this.getIntersectionIdByCoordinates(road.getX2(), road.getY2());
+		Intersection int_a = this.getIntersectionByCoordinates(road.getX1(), road.getY1());
+		Intersection int_b = this.getIntersectionByCoordinates(road.getX2(), road.getY2());
 		
-		if (int_a_id < 0 || int_b_id < 0) {
+		if (int_a == null || int_b == null) {
 			System.out.println("You tried adding a road between at least one missing Intersection."
 					+ "Probably, you should create intersections first, THEN add the road.");
 		} else if (this.roadAlreadyOccupied(road)) {
 			System.out.println("There already exists a road between these coordinates/intersections. Skipping addition.");
-		} else if (!this.intersections.get(int_a_id).connectionCanBeAdded() || !this.intersections.get(int_b_id).connectionCanBeAdded()) {
+		} else if (!int_a.connectionCanBeAdded() || !int_b.connectionCanBeAdded()) {
 			// TODO handle empty intersection leftovers
 			System.out.println("One of the intersections you are planning to connect can't have more connections added.");
 		} else {
-			this.roads.add(road);
-						
-			this.intersections.get(int_a_id).addConnection(this.roads.size() - 1, int_b_id, null);
-			this.intersections.get(int_b_id).addConnection(this.roads.size() - 1, int_a_id, null);			
+			this.roads.add(road);					
+			int_a.addConnection(road, int_b, null);
+			int_b.addConnection(road, int_a, null);			
 		}
 	}
+	
+	public void removeRoad(Road road) {
+		this.roads.remove(road);
+		for (Intersection intersection : this.intersections) {
+			intersection.adjustConnectionsAfterRoadRemoval(road);
+		}
+	}
+
 	
 	/**
 	 * Removes a road identified by the connected intersections. Always choose this over
@@ -149,53 +141,20 @@ public class StreetMap {
 	 * @param end		ID of the other intersection
 	 * @param road		ID of the road to be removed
 	 */
-	public void removeRoadBetween(int start, int end) {
-		int road_id = this.intersections.get(start).removeConnection(end);
-		this.intersections.get(end).removeConnection(start);
+	public void removeRoadBetween(Intersection a, Intersection b) {
+		Road road = a.removeConnectionTo(b);
+		b.removeConnectionTo(a);
 		
-	
-		if (road_id >= 0) {
-			this.roads.remove(road_id);
+		if (road != null) {
+			this.removeRoad(road);
 		} else {
 			System.out.println("Tried to remove inexistant road!");
-		}
-
-		// adjust intersection ids
-		for (Intersection intersection : this.intersections) {
-			intersection.adjustConnectionsAfterRoadRemoval(road_id);
 		}
 	}
 	
 	public void removeRoadBetweenCoordinates(int x1, int y1, int x2, int y2) {
-		int intersection_a = this.getIntersectionIdByCoordinates(x1, y1);
-		int intersection_b = this.getIntersectionIdByCoordinates(x2, y2);
-		
-		this.removeRoadBetween(intersection_a, intersection_b);
-	}
-	
-	/**
-	 * Removes a road identified by its ID.
-	 * 
-	 * @param road
-	 */
-	public void removeRoadById(int road_id) {
-		int intersection_a = -1;
-		int intersection_b = -1;
-
-		for (int int_id = 0; int_id < this.intersections.size(); int_id++) {
-			ArrayList<Connection> connections = this.intersections.get(int_id).getConnections();
-			for (int c_id = 0; c_id < connections.size(); c_id++) {
-				if (connections.get(c_id).getRoad() == road_id) {
-					intersection_a = int_id;
-					intersection_b = (int) connections.get(c_id).getDestination();
-					break;
-				}
-			}
-			
-			if (intersection_a >= 0 && intersection_b >= 0) {
-				break;
-			}
-		}
+		Intersection intersection_a = this.getIntersectionByCoordinates(x1, y1);
+		Intersection intersection_b = this.getIntersectionByCoordinates(x2, y2);
 		
 		this.removeRoadBetween(intersection_a, intersection_b);
 	}
@@ -214,33 +173,25 @@ public class StreetMap {
 		}
 	}
 	
-	/**
-	 * Removes an Intersection from the Map, including its column and row inside
-	 * the adjacency matrix. **NOTE**, that this is going to shift the indices of ALL
-	 * Intersections with a higher index. Didn't come up with a better solution yet, sorry.
-	 * @param id
-	 */
-	public void removeIntersection(int id) {
-		Intersection deleted_intersection = this.intersections.remove(id);
-		deleted_intersection.adjustConnectionsAfterIntersectionRemoval(id);
-		ArrayList<Integer> connected_intersections = deleted_intersection.getConnectedIntersectionIds();
-		ArrayList<Integer> connected_roads = deleted_intersection.getOutgoingRoadIds();
+	public void removeIntersection(Intersection removed_intersection) {
+		this.intersections.remove(removed_intersection);
+
+		ArrayList<Intersection> connected_intersections = removed_intersection.getConnectedIntersections();
+		ArrayList<Road> connected_roads = removed_intersection.getOutgoingRoads();
 		
-		// adjust intersection ids
-		for (Intersection intersection : this.intersections) {
-			intersection.adjustConnectionsAfterIntersectionRemoval(id);
-		}
-		
-		// remove connections from connected intersections
-		for (int int_id : connected_intersections) {
-			this.intersections.get(int_id).removeConnection(id);
+		// adjust intersections
+		for (Intersection adjusted_intersection : connected_intersections) {
+			adjusted_intersection.adjustConnectionsAfterIntersectionRemoval(removed_intersection);
+			if (adjusted_intersection.numbConnections() == 0) {
+				this.intersections.remove(adjusted_intersection);
+			}
 		}
 		
 		// remove old roads
-		for (int road_id : connected_roads) {
-			this.roads.remove(road_id);
+		for (Road road : connected_roads) {
+			this.roads.remove(road);
 			for (Intersection intersection : this.intersections) {
-				intersection.adjustConnectionsAfterRoadRemoval(road_id);				
+				intersection.adjustConnectionsAfterRoadRemoval(road);
 			}
 		}
 	}

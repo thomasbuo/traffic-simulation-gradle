@@ -2,10 +2,10 @@ package datastructures;
 
 public class TrafficLight {
 	private String status;
-	private int road;
-	private int intersection;
+	private Road road;
+	private Intersection intersection;
 
-	public TrafficLight(int road, int intersection) {
+	public TrafficLight(Road road, Intersection intersection) {
 		this.road = road;
 		this.intersection = intersection;
 		
@@ -17,7 +17,7 @@ public class TrafficLight {
 		return status;
 	}
 	
-	public int getRoad() {
+	public Road getRoad() {
 		return road;
 	}
 	

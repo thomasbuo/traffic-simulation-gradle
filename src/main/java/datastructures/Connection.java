@@ -2,11 +2,11 @@ package datastructures;
 
 public class Connection {
 
-	private int road;
-	private int destination;
+	private Road road;
+	private Intersection destination;
 	private TrafficLight trafficlight;
 	
-	public Connection(int road, int destination, TrafficLight trafficlight) {
+	public Connection(Road road, Intersection destination, TrafficLight trafficlight) {
 		this.road = road;
 		this.destination = destination;
 		
@@ -17,51 +17,35 @@ public class Connection {
 		}
 	}
 
-	/**
-	 * @return the road
-	 */
-	public int getRoad() {
+	// GETTER / SETTER
+	
+	public Road getRoad() {
 		return road;
 	}
 
-	/**
-	 * @param road the road to set
-	 */
-	public void setRoad(int road) {
+	public void setRoad(Road road) {
 		this.road = road;
 	}
 
-	/**
-	 * @return the destination
-	 */
-	public int getDestination() {
+	public Intersection getDestination() {
 		return destination;
 	}
 
-	/**
-	 * @param destination the destination to set
-	 */
-	public void setDestination(int destination) {
+	public void setDestination(Intersection destination) {
 		this.destination = destination;
 	}
 
-	/**
-	 * @return the trafficlight
-	 */
 	public TrafficLight getTrafficlight() {
 		return trafficlight;
 	}
 
-	/**
-	 * @param trafficlight the trafficlight to set
-	 */
 	public void setTrafficlight(TrafficLight trafficlight) {
 		this.trafficlight = trafficlight;
 	}
 
+	
 	@Override
 	public String toString() {
 		return "Connection [road=" + road + ", destination=" + destination + ", trafficlight=" + trafficlight + "]";
 	}
-
 }

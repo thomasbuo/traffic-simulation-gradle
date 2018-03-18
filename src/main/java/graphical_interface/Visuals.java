@@ -15,8 +15,6 @@ import datastructures.Road;
 import datastructures.StreetMap;
 
 public class Visuals extends JPanel{	
-	
-
 	private Simulation simulation;
 	private StreetMap streetMap;
 	private ArrayList<Road> roads;
@@ -131,8 +129,7 @@ public class Visuals extends JPanel{
 		}
 		
 		for (int i = 0; i < streetMap.getTrafficLights().size(); i++) {
-			int roadIndex = streetMap.getTrafficLights().get(i).getRoad();
-			Road road = streetMap.getRoads().get(roadIndex);
+			Road road= streetMap.getTrafficLights().get(i).getRoad();
 			int midPointX = (int) (road.getX1() +((road.getX2()-road.getX1())/2));
 			int midPointY = (int) (road.getY1() +((road.getY2()-road.getY1())/2));
 			g2.setColor(Color.cyan);
@@ -146,32 +143,29 @@ public class Visuals extends JPanel{
 		for(int i = 0; i<simulation.getCars().size(); i ++)
 		{
 			g2.fillOval((int)((simulation.getCars().get(i).getPositionX()-3)*zoomMultiplier + changeX), (int)((simulation.getCars().get(i).getPositionY()-3)*zoomMultiplier + changeY), (int)(7*zoomMultiplier), (int)(7*zoomMultiplier));
-		}
-		
-		
-	
-		
+		}		
 	}
-	public void IncreaseZoomMultiplier()
-	{
+	
+	public void IncreaseZoomMultiplier() {
 		zoomMultiplier = zoomMultiplier + 0.2;
 	}
-	public void DecreaseZoomMultiplier()
-	{
+	
+	public void DecreaseZoomMultiplier() {
 		zoomMultiplier = zoomMultiplier - 0.2;
 	}
-	public void resetZoomMultiplier()
-	{
+	
+	public void resetZoomMultiplier() {
 		zoomMultiplier = 1.0;
 	}
-	public double getZoomMultiplier()
-	{
+	
+	public double getZoomMultiplier() {
 		return zoomMultiplier;
 	}
+	
 	public int getStartPosX() {
 		return startPosX;
 	}
-
+	
 	public void setStartPosX(int startPosX) {
 		this.startPosX = startPosX;
 	}
@@ -203,8 +197,8 @@ public class Visuals extends JPanel{
 	public void setMousePosY(int mousePosY) {
 		this.mousePosY = mousePosY;
 	}
-	public void setDrawRed(Intersection drawRed)
-	{
+
+	public void setDrawRed(Intersection drawRed) {
 		this.drawRed = drawRed;
 	}
 }

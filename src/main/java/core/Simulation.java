@@ -27,7 +27,7 @@ public class Simulation {
 	public Simulation(StreetMap map) {
 		this.street_map = map;
 		this.cars = new ArrayList<Car>();
-		aStar = new Astar2(map);
+		this.aStar = new Astar2(map);
 	}
 	
 	// GETTERS / SETTERS
@@ -61,8 +61,16 @@ public class Simulation {
 		do {
 			destination = r.nextInt(this.street_map.getIntersections().size());
 		} while (destination == origin);
-	
-		this.addCar(new Car(this.street_map.getIntersection(origin), this.street_map.getIntersection(destination),aStar));
+		Intersection origin_intersection = this.street_map.getIntersection(origin);
+		Intersection destination_intersection = this.street_map.getIntersection(destination);
+		
+		this.aStar.setStart(origin_intersection);
+		this.aStar.setEnd(destination_intersection);
+		
+		ArrayList<Intersection> shortest_path = this.aStar.createPath();
+		System.out.println("Path: " + shortest_path);
+		
+		this.addCar(new Car(origin_intersection, destination_intersection, this.street_map));
 		System.out.println("created new car, x: " + this.street_map.getIntersection(origin).getXCoord() + ", y: " + this.street_map.getIntersection(origin).getYCoord() + ", total: "+ this.getCars().size());
 	}
 	
@@ -91,7 +99,7 @@ public class Simulation {
 				// update traffic light statuses
 				this.street_map.update();
 				// recalculate car positions
-				car.update(this.cars,null, t);
+				car.update(this.cars, t);
 				
 				System.out.println(car);
 			}

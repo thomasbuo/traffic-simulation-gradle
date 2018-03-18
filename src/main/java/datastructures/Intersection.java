@@ -4,59 +4,24 @@ import java.util.ArrayList;
 
 public class Intersection {
 	
+	// Position
 	private int x_coord;
 	private int y_coord;
 	
+	// Traffic Lights
 	private int tl_phase_length;
 	private int time_till_toggle;
 	
+	// A Star stuff
 	private double cost;
 	private Intersection parent;
 	private double g;
 	private double h;
-	public void resetCost()
-	{
-		cost = 1000000000;
-	}
-	public void resetParent()
-	{
-		parent = null;
-	}
-	public double getCost() {
-		return cost;
-	}
-
-	public void setCost(double distance) {
-		this.cost = distance;
-	}
-	public void setG(double g) {
-		this.g = g;
-	}
-	public double getG() {
-		return g;
-	}
-
-	public void setH(double h) {
-		this.h = h;
-	}
-	public double getH() {
-		return h;
-	}
-
-	public Intersection getParent() {
-		return parent;
-	}
-
-	public void setParent(Intersection parent) {
-		this.parent = parent;
-	}
-
 	
-	
-	/**
-	 * Connections are of format (road, intersection, traffic light)
-	 */
+	// Connections
 	private ArrayList<Connection> connections;
+	
+	// CONSTRUCTORS
 	
 	public Intersection(int x, int y) {
 		this.x_coord = x;
@@ -86,8 +51,50 @@ public class Intersection {
 		this.tl_phase_length = tl_phase_length;
 	}
 
-	public ArrayList<Integer> getOutgoingRoadIds() {
-		ArrayList<Integer> outgoing = new ArrayList<Integer>();
+	public void resetCost()
+	{
+		cost = 1000000000;
+	}
+	
+	public void resetParent()
+	{
+		parent = null;
+	}
+	
+	public double getCost() {
+		return cost;
+	}
+
+	public void setCost(double distance) {
+		this.cost = distance;
+	}
+	
+	public void setG(double g) {
+		this.g = g;
+	}
+	
+	public double getG() {
+		return g;
+	}
+
+	public void setH(double h) {
+		this.h = h;
+	}
+	
+	public double getH() {
+		return h;
+	}
+
+	public Intersection getParent() {
+		return parent;
+	}
+
+	public void setParent(Intersection parent) {
+		this.parent = parent;
+	}
+	
+	public ArrayList<Road> getOutgoingRoads() {
+		ArrayList<Road> outgoing = new ArrayList<Road>();
 		for (Connection c : this.connections) {
 			outgoing.add(c.getRoad());
 		}
@@ -95,8 +102,8 @@ public class Intersection {
 		return outgoing;
 	}
 	
-	public ArrayList<Integer> getConnectedIntersectionIds() {
-		ArrayList<Integer> intersections = new ArrayList<Integer>();
+	public ArrayList<Intersection> getConnectedIntersections() {
+		ArrayList<Intersection> intersections = new ArrayList<Intersection>();
 		for (Connection c : this.connections) {
 			intersections.add(c.getDestination());
 		}
@@ -104,14 +111,14 @@ public class Intersection {
 		return intersections;
 	}
 	
-	public int getRoadTo(int to) {
+	public Intersection getRoadTo(Intersection destination) {
 		for (Connection c : this.connections) {
-			if ((int) c.getDestination() == to) {
+			if (c.getDestination() == destination) {
 				return c.getDestination();
 			}
 		}
 		
-		return -1;
+		return null;
 	}
 	
 	public ArrayList<Connection> getConnections() {
@@ -129,14 +136,14 @@ public class Intersection {
 	
 	// MODIFICATION
 	
-	public void addConnection(int road_id, int intersection_id, TrafficLight trafficlight) {
-		connections.add(new Connection(road_id, intersection_id, trafficlight));
+	public void addConnection(Road road, Intersection intersection, TrafficLight trafficlight) {
+		connections.add(new Connection(road, intersection, trafficlight));
 	}
 	
-	public int removeConnection(int intersection_id) {
-		int removed_road = -1;
+	public Road removeConnectionTo(Intersection intersection) {
+		Road removed_road = null;
 		for (int i = 0; i < this.connections.size(); i++) {
-			if (this.connections.get(i).getDestination() == intersection_id) {
+			if (this.connections.get(i).getDestination() == intersection) {
 				removed_road = this.connections.get(i).getRoad();
 				this.connections.remove(i);
 			}
@@ -145,18 +152,18 @@ public class Intersection {
 		return removed_road;
 	}
 	
-	public void adjustConnectionsAfterIntersectionRemoval(int removed_intersection_id) {
+	public void adjustConnectionsAfterIntersectionRemoval(Intersection removed_intersection) {
 		for (Connection c : this.connections) {
-			if (c.getDestination() > removed_intersection_id) {
-				c.setDestination(c.getDestination() - 1);
+			if (c.getDestination() == removed_intersection) {
+				this.connections.remove(c);
 			}
 		}
 	}
 	
-	public void adjustConnectionsAfterRoadRemoval(int removed_road_id) {
+	public void adjustConnectionsAfterRoadRemoval(Road removed_road) {
 		for (Connection c : this.connections) {
-			if (c.getRoad() > removed_road_id) {
-				c.setRoad(c.getRoad() - 1);
+			if (c.getRoad() == removed_road) {
+				this.connections.remove(c);
 			}
 		}
 	}
