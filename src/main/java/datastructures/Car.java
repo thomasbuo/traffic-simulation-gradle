@@ -186,6 +186,7 @@ public class Car {
 		for(Car c: list_of_cars)
 			sum_of_velocities += c.getVelocity();
 
+
 		return sum_of_velocities/list_of_cars.size();
 	}
 
